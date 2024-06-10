@@ -23,8 +23,7 @@ The exporter can monitor multiple UPSs.
 - Battery Health Status (given as the remaining lifetime in years [uncertain, contribute to [#19](https://github.com/psyinfra/prometheus-eaton-ups-exporter/issues/19)])
 
 ## Supported Devices:
-* Eaton 5P 1550iR ([user guide](https://www.eaton.com/content/dam/eaton/products/backup-power-ups-surge-it-power-distribution/power-management-software-connectivity/eaton-gigabit-network-card/eaton-network-m2-user-guide.pdf))
-* Other models may also work if they use the same API
+* Eaton 5P Series should work with recent firmwares
 
 ## Usage:
 UPSs to monitor and their credentials are defined in a config file. See
@@ -78,3 +77,20 @@ Runt tests with
 #### Test-Requirements:
 - pytest
 - pytest-vcr
+
+
+# Build container image
+```
+podman buildx build --platform linux/amd64,linux/arm64 -t prometheus-eaton-ups-exporter:latest .
+```
+test it locally:
+```
+podman run -d -p 9795:9795 -v ./config.json:/usr/src/app/etc/config.json:Z localhost/prometheus-eaton-ups-exporter:latest
+```
+
+## To publish multi arch
+```
+podman manifest create prometheus-eaton-ups-exporter:latest
+podman buildx build --platform=linux/arm64,linux/amd64 --file Dockerfile --manifest prometheus-eaton-ups-exporter:latest .
+podman manifest push prometheus-eaton-ups-exporter:latest docker://your-registry.io/prometheus-eaton-ups-exporter:latest
+```

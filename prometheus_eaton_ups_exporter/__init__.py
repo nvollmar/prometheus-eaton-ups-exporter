@@ -3,7 +3,7 @@
 import logging
 
 # External (root level) logging level
-logging.basicConfig(level=logging.ERROR, format='ERROR: %(message)s')
+logging.basicConfig(level=logging.ERROR, format='%(levelname)s - %(message)s')
 
 
 def create_logger(name: str,
