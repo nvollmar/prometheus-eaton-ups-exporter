@@ -8,7 +8,9 @@ from prometheus_eaton_ups_exporter.scraper_globals import (
         INVALID_URL_ERROR,
         LoginFailedException,
         MISSING_SCHEMA_ERROR,
-        REST_API_PATH,
+        REST_MANAGER_PATH,
+        REST_POWER_PATH,
+        REST_TEMPERATURES_PATH,
         TIMEOUT_ERROR,
         )
 
@@ -47,7 +49,7 @@ def test_login(scraper_fixture) -> None:
 def test_load_rest_api(scraper_fixture) -> None:
     """Tests load_page function with rest api."""
     request = scraper_fixture.load_page(
-        scraper_fixture.ups_address + REST_API_PATH
+        scraper_fixture.ups_address + REST_POWER_PATH
     )
     # Todo
     json_response = request.json()
@@ -211,6 +213,6 @@ def test_auth_failed_exception(monkeypatch, ups_scraper_conf) -> None:
                 "message"
             )
         )
-        scraper.load_page(address + REST_API_PATH)
+        scraper.load_page(address + REST_POWER_PATH)
     assert pytest_wrapped_e.type == LoginFailedException
     assert pytest_wrapped_e.value.error_code == AUTHENTICATION_FAILED

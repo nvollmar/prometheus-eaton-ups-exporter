@@ -18,13 +18,15 @@ from prometheus_eaton_ups_exporter.scraper_globals import (
         CONNECTION_ERROR,
         INPUT_MEMBER_ID,
         INVALID_URL_ERROR,
-        LOGIN_AUTH_PATH,
         LOGIN_DATA,
         LoginFailedException,
         MISSING_SCHEMA_ERROR,
         OUTPUT_MEMBER_ID,
         REQUEST_TIMEOUT,
-        REST_API_PATH,
+        REST_AUTH_PATH,
+        REST_MANAGER_PATH,
+        REST_POWER_PATH,
+        REST_TEMPERATURES_PATH,
         SSL_ERROR,
         TIMEOUT_ERROR,
         )
@@ -88,7 +90,7 @@ class UPSScraper:
             data["password"] = self.password
 
             login_request = self.session.post(
-                self.ups_address + LOGIN_AUTH_PATH,
+                self.ups_address + REST_AUTH_PATH,
                 data=json.dumps(data),  # needs to be JSON encoded
                 timeout=self.login_timeout
             )
@@ -98,8 +100,8 @@ class UPSScraper:
             access_token = login_response['access_token']
 
             self.logger.debug(
-                "Authentication successful on (%s)",
-                self.ups_address
+                "Authentication successful on (%s) with %s %s",
+                self.ups_address, token_type, access_token
             )
 
             return token_type, access_token
@@ -167,6 +169,7 @@ class UPSScraper:
 
             # Session might be expired, connect again
             try:
+                print(str(request))
                 if "errorCode" in request.json():
                     self.logger.debug('Session expired, reconnect')
                     self.token_type, self.access_token = self.login()
@@ -201,6 +204,56 @@ class UPSScraper:
         except LoginFailedException:
             raise
 
+    def get_system(self) -> dict:
+        system = dict()
+        try:
+            manager_request = self.load_page(
+                self.ups_address+REST_MANAGER_PATH
+            )
+            manager_overview = manager_request.json()
+
+            system = manager_overview['identification']
+
+        except LoginFailedException as err:
+            self.logger.error(err)
+            print(f"{err.__class__.__name__} - ({self.ups_address}): "
+                  f"{err.message}")
+        except json.decoder.JSONDecodeError as err:
+            self.logger.debug("Failed to decode system response")
+            self.logger.error(err)
+        except Exception:
+            raise
+
+        return system
+
+
+    def get_temperature(self) -> dict:
+        temperature = dict()
+        try:
+            temperatures_request = self.load_page(
+                self.ups_address+REST_TEMPERATURES_PATH
+            )
+            temperatures_overview = temperatures_request.json()
+
+            temperature_path = temperatures_overview['members'][0]['@id']
+            temperature_request = self.load_page(
+                self.ups_address+temperature_path
+            )
+            temperature = temperature_request.json()
+
+        except LoginFailedException as err:
+            self.logger.error(err)
+            print(f"{err.__class__.__name__} - ({self.ups_address}): "
+                  f"{err.message}")
+        except json.decoder.JSONDecodeError as err:
+            self.logger.debug("Failed to decode temperature response")
+            self.logger.error(err)
+        except Exception:
+            raise
+
+        return temperature
+
+
     def get_measures(self) -> dict:
         """
         Get most relevant UPS metrics.
@@ -215,7 +268,7 @@ class UPSScraper:
         measurements = dict()
         try:
             power_dist_request = self.load_page(
-                self.ups_address+REST_API_PATH
+                self.ups_address+REST_POWER_PATH
             )
             power_dist_overview = power_dist_request.json()
 
@@ -258,9 +311,16 @@ class UPSScraper:
             print(f"{err.__class__.__name__} - ({self.ups_address}): "
                   f"{err.message}")
         except json.decoder.JSONDecodeError as err:
-            self.logger.debug("This needs to be solved by a developer")
+            self.logger.debug("Failed to decode measure response")
             self.logger.error(err)
         except Exception:
             raise
 
         return measurements
+
+    def get_data(self) -> dict:
+        data = dict()
+        data['system'] = self.get_system()
+        data['temperature'] = self.get_temperature()
+        data['measures'] = self.get_measures()
+        return data

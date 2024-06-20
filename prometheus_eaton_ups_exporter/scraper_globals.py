@@ -5,8 +5,10 @@ This will need new configurations when the API changes.
 """
 
 # these will be added to the original url (ex: https://eaton.ups.com)
-LOGIN_AUTH_PATH = '/rest/mbdetnrs/1.0/oauth2/token'
-REST_API_PATH = '/rest/mbdetnrs/1.0/powerDistributions/1'
+REST_AUTH_PATH = '/rest/mbdetnrs/1.0/oauth2/token'
+REST_POWER_PATH = '/rest/mbdetnrs/1.0/powerDistributions/1'
+REST_MANAGER_PATH = '/rest/mbdetnrs/1.0/managers/1'
+REST_TEMPERATURES_PATH = '/rest/mbdetnrs/1.0/environmentService/temperatures'
 
 # As there could be multiple inputs and outputs,
 # take the first one
