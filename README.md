@@ -7,7 +7,12 @@ web UI of Eaton UPSs and is made available for Prometheus to scrape.
 
 The exporter can monitor multiple UPSs.
 
+This is a fork of [psyinfra/prometheus-eaton-ups-exporter](https://github.com/psyinfra/prometheus-eaton-ups-exporter)
+with updates from [adyekjaer/prometheus-eaton-ups-exporter](https://github.com/adyekjaer/prometheus-eaton-ups-exporter)
+
 ## Information Exported
+- System details
+- Temperature
 - Input Voltage (V)
 - Input Frequency (Hz)
 - Output Voltage (V)
@@ -20,7 +25,7 @@ The exporter can monitor multiple UPSs.
 - Battery Voltage (V)
 - Battery Capacity (%)
 - Battery Remaining Time (s)
-- Battery Health Status (given as the remaining lifetime in years [uncertain, contribute to [#19](https://github.com/psyinfra/prometheus-eaton-ups-exporter/issues/19)])
+- Battery Health Status (given as the remaining lifetime in years [uncertain, see [#19](https://github.com/psyinfra/prometheus-eaton-ups-exporter/issues/19)])
 
 ## Supported Devices:
 * Eaton 5P Series should work with recent firmwares
@@ -94,3 +99,8 @@ podman manifest create prometheus-eaton-ups-exporter:latest
 podman buildx build --platform=linux/arm64,linux/amd64 --file Dockerfile --manifest prometheus-eaton-ups-exporter:latest .
 podman manifest push prometheus-eaton-ups-exporter:latest docker://your-registry.io/prometheus-eaton-ups-exporter:latest
 ```
+
+
+# Credits
+* [psyinfra](https://github.com/psyinfra) for the exporter itself
+* [adyekjaer](https://github.com/adyekjaer) for updates to work with newer firmwares
