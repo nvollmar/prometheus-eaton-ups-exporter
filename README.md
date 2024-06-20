@@ -69,6 +69,9 @@ optional arguments:
     cd prometheus-eaton-ups-exporter
     pip install -r requirements.txt
 
+# Docker
+Images available at [hub.docker.com](https://hub.docker.com/repository/docker/aluveitie/prometheus-eaton-ups-exporter)
+
 # Testing:
 
 Install requirements with
