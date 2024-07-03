@@ -60,13 +60,19 @@ class UPSExporter:
                 ups_id = measures.get('ups_id')
                 inputs = measures.get('ups_inputs')
                 outputs = measures.get('ups_outputs')
-                powerbank_details = measures.get('ups_powerbank')
+
                 inputs_measures = inputs['measures']
+                if 'realtime' in inputs['measures']: # backwards compatibility
+                    inputs_measures = inputs['measures']['realtime']
                 outputs_measures = outputs['measures']
+                if 'realtime' in outputs['measures']: # backwards compatibility
+                    outputs_measures = outputs['measures']['realtime']
+
                 inputs_status = inputs['status']
                 outputs_status = outputs['status']
                 inputs_spec = inputs['specifications']
                 outputs_spec = outputs['specifications']
+                powerbank_details = measures.get('ups_powerbank')
                 powerbank_m = powerbank_details['measures']
                 powerbank_s = powerbank_details['status']
 
@@ -85,6 +91,14 @@ class UPSExporter:
                     labels=['ups_id']
                 )
                 gauge.add_metric([ups_id], inputs_measures['frequency'])
+                yield gauge
+
+                gauge = GaugeMetricFamily(
+                    "eaton_ups_input_amperes",
+                    'UPS input current (A)',
+                    labels=['ups_id']
+                )
+                gauge.add_metric([ups_id], inputs_measures.get('current', 0))
                 yield gauge
 
                 gauge = GaugeMetricFamily(
@@ -232,7 +246,7 @@ class UPSExporter:
                     'UPS battery state of charge (%)',
                     labels=['ups_id']
                 )
-                gauge.add_metric( [ups_id], powerbank_m['stateOfCharge'])
+                gauge.add_metric([ups_id], powerbank_m['stateOfCharge'])
                 yield gauge
 
                 gauge = GaugeMetricFamily(
