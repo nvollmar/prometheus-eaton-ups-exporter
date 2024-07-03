@@ -126,9 +126,9 @@ class UPSExporter:
                 yield gauge
 
                 if inputs_status['health'] == 'ok':
-                    health_value = 0
-                else:
                     health_value = 1
+                else:
+                    health_value = 0
                 gauge = GaugeMetricFamily(
                     "eaton_ups_input_health",
                     'UPS input health status',
