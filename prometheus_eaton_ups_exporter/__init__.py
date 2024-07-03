@@ -3,7 +3,7 @@
 import logging
 
 # External (root level) logging level
-logging.basicConfig(level=logging.ERROR, format='%(levelname)s - %(message)s')
+logging.basicConfig(level=logging.ERROR, format='%(levelname)s: %(message)s')
 
 
 def create_logger(name: str,
@@ -18,7 +18,7 @@ def create_logger(name: str,
 
     # create debug formatter
     debug_formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        'DEBUG %(name)s: %(message)s'
     )
     # add formatter to debug_sh
     debug_sh.setFormatter(debug_formatter)
