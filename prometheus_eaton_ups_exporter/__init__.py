@@ -1,24 +1,25 @@
 """Initials of the Prometheus Eaton UPS Exporter."""
 
 import logging
+import sys
 
 # External (root level) logging level
-logging.basicConfig(level=logging.ERROR, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(levelname)s: %(message)s')
 
 
 def create_logger(name: str,
                   disabled: bool = False) -> logging.Logger:
     """Create logger for debug and error levels."""
     logger = logging.Logger(name)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
 
     # create console handler and set level to debug
-    debug_sh = logging.StreamHandler()
+    debug_sh = logging.StreamHandler(sys.stdout)
     debug_sh.setLevel(logging.DEBUG)
 
     # create debug formatter
     debug_formatter = logging.Formatter(
-        'DEBUG %(name)s: %(message)s'
+        '%(name)s: %(levelname)s %(message)s'
     )
     # add formatter to debug_sh
     debug_sh.setFormatter(debug_formatter)
@@ -30,7 +31,7 @@ def create_logger(name: str,
 
     # create error formatter
     error_formatter = logging.Formatter(
-        'ERROR %(name)s:%(lineno)s %(message)s'
+        '%(name)s:%(lineno)s %(levelname)s %(message)s'
     )
     # add formatter to error_sh
     error_sh.setFormatter(error_formatter)
